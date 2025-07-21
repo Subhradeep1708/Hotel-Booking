@@ -20,7 +20,7 @@ export const Dropdown = ({ user }: { user: any }) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-2 cursor-pointer">
+                <div className="flex items-center gap-3 cursor-pointer mx-2">
                     {/* avatar */}
                     <Avatar>
                         <AvatarImage src={user.picture} />
@@ -33,11 +33,11 @@ export const Dropdown = ({ user }: { user: any }) => {
                         </AvatarFallback>
                     </Avatar>
                     <div>
-                        <div className="flex gap-1 font-bold">
+                        <div className="flex gap-1 font-bold text-sm">
                             <p>{user.given_name}</p>
                             <p>{user.family_name}</p>
                         </div>
-                        <p className="text-sm font-semibold">{user.email}</p>
+                        <p className="text-xs font-semibold">{user.email}</p>
                     </div>
                 </div>
             </DropdownMenuTrigger>

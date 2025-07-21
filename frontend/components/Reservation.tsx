@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { format, isPast } from "date-fns";
+import { format, isPast,isToday } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import {
     Popover,
@@ -80,10 +80,10 @@ const Reservation = ({
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
-                                variant="default"
+                                variant="outline"
                                 size={"lg"}
                                 data-empty={!checkinDate}
-                                className="data-[empty=true]:text-muted-foreground justify-start text-left font-semibold w-full"
+                                className="data-[empty=true]:text-muted-foreground justify-start text-left font-semibold w-full mt-2"
                             >
                                 <CalendarIcon />
                                 {checkinDate ? (
@@ -98,7 +98,9 @@ const Reservation = ({
                                 mode="single"
                                 selected={checkinDate}
                                 onSelect={setCheckinDate}
-                                disabled={isPast}
+                                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                                
+                                
                             />
                         </PopoverContent>
                     </Popover>
@@ -125,6 +127,7 @@ const Reservation = ({
                                 selected={checkoutDate}
                                 onSelect={setCheckoutDate}
                                 disabled={isPast}
+                                
                             />
                         </PopoverContent>
                     </Popover>
