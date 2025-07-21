@@ -1,8 +1,9 @@
+// 2 hour 39 minutes
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { format, isPast,isToday } from "date-fns";
+import { format, isPast, isToday } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import {
     Popover,
@@ -98,9 +99,10 @@ const Reservation = ({
                                 mode="single"
                                 selected={checkinDate}
                                 onSelect={setCheckinDate}
-                                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                                
-                                
+                                disabled={(date) =>
+                                    date <
+                                    new Date(new Date().setHours(0, 0, 0, 0))
+                                }
                             />
                         </PopoverContent>
                     </Popover>
@@ -127,7 +129,6 @@ const Reservation = ({
                                 selected={checkoutDate}
                                 onSelect={setCheckoutDate}
                                 disabled={isPast}
-                                
                             />
                         </PopoverContent>
                     </Popover>
