@@ -11,6 +11,23 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
+
+const postData = async (url: string, data: any) => {
+    try {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: data,
+        });
+        const responseData: any = await res.json();
+        return responseData;
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 const Reservation = ({
     reservations,
@@ -25,6 +42,31 @@ const Reservation = ({
 }) => {
     const [checkinDate, setCheckinDate] = useState<Date>();
     const [checkoutDate, setCheckoutDate] = useState<Date>();
+    const [alertMessage, setAlertMessage] = useState<null | {
+        message: string;
+        type: "error" | "success" | null;
+    }>(null);
+
+    const saveReservation = async () => {
+        //
+        if (!checkinDate || !checkoutDate) {
+            setAlertMessage({
+                type: "error",
+                message: "Please select both check-in and check-out dates.",
+            });
+
+            if (checkinDate?.getTime() === checkoutDate?.getTime()) {
+                setAlertMessage({
+                    type: "error",
+                    message: "Check-in and check-out dates cannot be the same.",
+                });
+            }
+
+            return;
+        }
+        console.log("reservation saved");
+    };
+
     return (
         <div>
             <div className="bg-tertiary h-[320px] mb-4">
@@ -88,6 +130,26 @@ const Reservation = ({
                     </Popover>
 
                     {/*  */}
+                    {isUserAuthenticated ? (
+                        <Button
+                            onClick={() => {
+                                saveReservation();
+                            }}
+                            size={"lg"}
+                        >
+                            Book Now{" "}
+                        </Button>
+                    ) : (
+                        <LoginLink>
+                            <Button
+                                className="w-full"
+                                variant={"primary"}
+                                size={"lg"}
+                            >
+                                Log In to Book
+                            </Button>
+                        </LoginLink>
+                    )}
                 </div>
             </div>
         </div>
