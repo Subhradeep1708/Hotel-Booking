@@ -45,7 +45,7 @@ const Header = async () => {
                         {/* logo */}
                         <Link href="/" className="flex items-center gap-2">
                             <Image src="/assets/logo.svg" alt="logo" width={160} height={160} />
-                            <span className="text-2xl font-bold">Hotel Booking</span>
+                            <span className="text-2xl font-bold">Hotels </span>
                         </Link>
                         {/* separator */}
                         <div className='w-[1px] h-[40px] bg-gray-300'></div>
