@@ -1,11 +1,12 @@
 import React from 'react'
 
 const Nav = () => {
-  return (
-    <div>
-      
-    </div>
-  )
+    return (
+        <div>
+
+        </div>
+    )
 }
 
 export default Nav
+        

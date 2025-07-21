@@ -43,11 +43,11 @@ export default function RootLayout({
         ${urbanist.variable}
         antialiased`}
       >
+        <Header />
         <main className="container mx-auto px-4 max-w-6xl 2xl:max-w-7xl py-8">
-          <Header />
           {children}
-          <Footer/>
         </main>
+        <Footer />
       </body>
     </html>
   );
