@@ -1,13 +1,19 @@
+import Reservation from "@/components/Reservation";
 import Image from "next/image";
-import { TbArrowsCross, TbArrowsMaximize, TbUser, TbUsers } from "react-icons/tb";
-
+import {
+    TbArrowsCross,
+    TbArrowsMaximize,
+    TbUser,
+    TbUsers,
+} from "react-icons/tb";
 
 const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
     const id = (await params).id;
     let room: any;
     try {
-
-        const res = await fetch(`http://127.0.0.1:1337/api/rooms/${id}?populate=*`);
+        const res = await fetch(
+            `http://127.0.0.1:1337/api/rooms/${id}?populate=*`
+        );
         // console.log("success::", res);
         const result = await res.json();
         room = result.data;
@@ -15,7 +21,7 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
     } catch (error) {
         console.log("error");
     }
-    const imgURL = `http://127.0.0.1:1337${room.image.url}`
+    const imgURL = `http://127.0.0.1:1337${room.image.url}`;
     console.log("imgURL::", imgURL);
 
     return (
@@ -29,7 +35,7 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
                             <Image
                                 src={imgURL}
                                 fill
-                                alt=''
+                                alt=""
                                 className="object-cover"
                             />
                         </div>
@@ -39,7 +45,9 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
                                 <h3 className="h3">{room.title}</h3>
                                 <p className="h3 font-secondary font-medium text-accent">
                                     ${room.price}
-                                    <span className="text-base text-secondary">/ night</span>
+                                    <span className="text-base text-secondary">
+                                        / night
+                                    </span>
                                 </p>
                             </div>
                             {/* info */}
@@ -48,7 +56,9 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
                                     <div className="text-2xl text-accent">
                                         <TbArrowsMaximize />
                                     </div>
-                                    <p>{room.size} m <sup>2</sup></p>
+                                    <p>
+                                        {room.size} m <sup>2</sup>
+                                    </p>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="text-2xl text-accent">
@@ -61,13 +71,13 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
                         </div>
                     </div>
                     {/* reservation */}
-                    <div className="w-full lg:max-w-[360px] h-max bg-green-300">reservation</div>
-
+                    <div className="w-full lg:max-w-[360px] h-max">
+                        <Reservation />
+                    </div>
                 </div>
             </div>
-        </section >
-    )
-}
+        </section>
+    );
+};
 
-export default RoomDetails
-
+export default RoomDetails;
