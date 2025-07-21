@@ -11,6 +11,10 @@ import {
 } from "@kinde-oss/kinde-auth-nextjs/components";
 import { Dropdown } from "./Dropdown";
 import { Button } from "./ui/button";
+import Nav from "./Nav";
+import MobileNav from "./MobileNav";
+
+
 
 const socials = [
     {
@@ -53,9 +57,7 @@ const Header = async () => {
                                 width={160}
                                 height={160}
                             />
-                            <span className="text-2xl font-bold">
-                                Hotel Booking
-                            </span>
+                            
                         </Link>
                         {/* separator */}
                         <div className="w-[1px] h-[40px] bg-gray-300"></div>
@@ -77,8 +79,8 @@ const Header = async () => {
                         </div>
                     </div>
                     {/* sign in & sign up */}
-                    <div>
-                        <div>
+                    <div className="flex items-center justify-center gap-8 xl:w-max">
+                        <div className="flex items-center gap-2 lg:order-2">
                             {isUserAuthenticated ? (
                                 <Dropdown user={user} />
                             ) : (
@@ -98,6 +100,15 @@ const Header = async () => {
                                     </RegisterLink>
                                 </div>
                             )}
+
+                            {/* Moblie Nav */}
+                            <div className="lg:hidden">
+                                <MobileNav />
+                            </div>
+                        </div>
+                        {/* Desktop Nav */}
+                        <div className="hidden lg:flex">
+                            <Nav isUserAuthenticated={isUserAuthenticated} />
                         </div>
                     </div>
                 </div>
