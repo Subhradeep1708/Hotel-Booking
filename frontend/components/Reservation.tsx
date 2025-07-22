@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import { useRouter } from "next/navigation";
+import PaymentPage from "@/app/test/page";
+import Payment from "./Payment";
 
 const postData = async (url: string, data: any) => {
     try {
@@ -36,27 +39,90 @@ const Reservation = ({
     isUserAuthenticated,
     userData,
 }: {
-    reservations: any[];
+    reservations: any;
     room: any;
     isUserAuthenticated: boolean | null;
     userData: any;
 }) => {
-    const [checkinDate, setCheckinDate] = useState<Date>();
-    const [checkoutDate, setCheckoutDate] = useState<Date>();
+    const [checkInDate, setCheckInDate] = useState<Date>();
+    const [checkOutDate, setCheckOutDate] = useState<Date>();
     const [alertMessage, setAlertMessage] = useState<null | {
         message: string;
         type: "error" | "success" | null;
     }>(null);
 
+    const router = useRouter();
+
+    const formatDateForStrapi = (date: Date) => {
+        return date.toISOString().split("T")[0]; // Format to YYYY-MM-DD
+    };
+
+    // filter out reservations that overlap with the selected dates
+    const isReserved = reservations.data
+        .filter((item: any) => item.room.data.id == room.id)
+        .some((item: any) => {
+            if (!checkInDate || !checkOutDate) return false;
+            const existingCheckIn = new Date(item.attributes.checkIn).setHours(
+                0,
+                0,
+                0,
+                0
+            );
+            const existingCheckout = new Date(
+                item.attributes.checkOut
+            ).setHours(0, 0, 0, 0);
+
+            const checkInTime = checkInDate?.setHours(0, 0, 0, 0);
+            const checkoutTime = checkOutDate?.setHours(0, 0, 0, 0);
+
+            // check if overlaps
+            const isReservedBetweenHours =
+                (checkInTime >= existingCheckIn &&
+                    checkInTime < existingCheckout) ||
+                (checkoutTime > existingCheckIn &&
+                    checkoutTime <= existingCheckout) ||
+                (existingCheckIn > checkInTime &&
+                    existingCheckIn < checkoutTime) ||
+                (existingCheckout > checkInTime &&
+                    existingCheckout < checkoutTime);
+        });
+
+    if (isReserved) {
+        setAlertMessage({
+            type: "error",
+            message: "This room is already reserved for the selected dates.",
+        });
+    } else {
+        const payload = {
+            data: {
+                firstName: userData?.firstName,
+                lastName: userData?.lastName,
+                email: userData?.email,
+                checkIn: checkInDate ? formatDateForStrapi(checkInDate) : null,
+                checkOut: checkOutDate
+                    ? formatDateForStrapi(checkOutDate)
+                    : null,
+                room: room.id,
+            },
+        };
+
+        postData("http://localhost:1337/api/reservations", payload);
+        setAlertMessage({
+            type: "success",
+            message: "Reservation saved successfully.",
+        });
+        router.refresh();
+    }
+
     const saveReservation = async () => {
         //
-        if (!checkinDate || !checkoutDate) {
+        if (!checkInDate || !checkOutDate) {
             setAlertMessage({
                 type: "error",
                 message: "Please select both check-in and check-out dates.",
             });
 
-            if (checkinDate?.getTime() === checkoutDate?.getTime()) {
+            if (checkInDate?.getTime() === checkOutDate?.getTime()) {
                 setAlertMessage({
                     type: "error",
                     message: "Check-in and check-out dates cannot be the same.",
@@ -83,12 +149,12 @@ const Reservation = ({
                             <Button
                                 variant="outline"
                                 size={"lg"}
-                                data-empty={!checkinDate}
+                                data-empty={!checkInDate}
                                 className="data-[empty=true]:text-muted-foreground justify-start text-left font-semibold w-full mt-2"
                             >
                                 <CalendarIcon />
-                                {checkinDate ? (
-                                    format(checkinDate, "PPP")
+                                {checkInDate ? (
+                                    format(checkInDate, "PPP")
                                 ) : (
                                     <span>Check In Date</span>
                                 )}
@@ -97,8 +163,8 @@ const Reservation = ({
                         <PopoverContent className="w-auto p-0">
                             <Calendar
                                 mode="single"
-                                selected={checkinDate}
-                                onSelect={setCheckinDate}
+                                selected={checkInDate}
+                                onSelect={setCheckInDate}
                                 disabled={(date) =>
                                     date <
                                     new Date(new Date().setHours(0, 0, 0, 0))
@@ -111,13 +177,13 @@ const Reservation = ({
                         <PopoverTrigger asChild>
                             <Button
                                 variant="outline"
-                                data-empty={!checkoutDate}
+                                data-empty={!checkOutDate}
                                 size={"lg"}
                                 className="data-[empty=true]:text-muted-foreground justify-start text-left font-semibold w-full mt-2"
                             >
                                 <CalendarIcon />
-                                {checkoutDate ? (
-                                    format(checkoutDate, "PPP")
+                                {checkOutDate ? (
+                                    format(checkOutDate, "PPP")
                                 ) : (
                                     <span>Check Out Date</span>
                                 )}
@@ -126,8 +192,8 @@ const Reservation = ({
                         <PopoverContent className="w-auto p-0">
                             <Calendar
                                 mode="single"
-                                selected={checkoutDate}
-                                onSelect={setCheckoutDate}
+                                selected={checkOutDate}
+                                onSelect={setCheckOutDate}
                                 disabled={isPast}
                             />
                         </PopoverContent>
@@ -135,14 +201,17 @@ const Reservation = ({
 
                     {/*  */}
                     {isUserAuthenticated ? (
-                        <Button
-                            onClick={() => {
-                                saveReservation();
+                        <Payment
+                            onPaymentSuccess={saveReservation}
+                            amountInRupees={100}
+                            customerData={{
+                                firstName: userData?.firstName,
+                                lastName: userData?.lastName,
+                                email: userData?.email,
                             }}
-                            size={"lg"}
                         >
-                            Book Now{" "}
-                        </Button>
+                            Book Now
+                        </Payment>
                     ) : (
                         <LoginLink>
                             <Button
@@ -153,6 +222,19 @@ const Reservation = ({
                                 Log In to Book
                             </Button>
                         </LoginLink>
+                    )}
+
+                    {alertMessage && (
+                        <div
+                            className={cn(
+                                "p-4 rounded-md font-semibold text-sm",
+                                alertMessage.type === "error"
+                                    ? "bg-red-100 text-red-800"
+                                    : "bg-green-100 text-green-800"
+                            )}
+                        >
+                            {alertMessage.message}
+                        </div>
                     )}
                 </div>
             </div>
