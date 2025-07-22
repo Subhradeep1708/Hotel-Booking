@@ -3,6 +3,8 @@ import { Geist, Geist_Mono, Marcellus, Urbanist } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/sonner"
+ 
 
 
 const geistSans = Geist({
@@ -47,6 +49,8 @@ export default function RootLayout({
         <main className="container mx-auto px-4 max-w-6xl 2xl:max-w-7xl py-8">
           {children}
         </main>
+                <Toaster />
+
         <Footer />
       </body>
     </html>

@@ -16,21 +16,30 @@ import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { useRouter } from "next/navigation";
 import PaymentPage from "@/app/test/page";
 import Payment from "./Payment";
+import { toast } from "sonner"
 
-const postData = async (url: string, data: any) => {
-    try {
-        const res = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: data,
-        });
-        const responseData: any = await res.json();
-        return responseData;
-    } catch (error) {
-        console.log(error);
-    }
+const normalizeDate = (date: Date): number => {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+};
+
+const parseStrapiDate = (dateStr: string): Date => {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    return new Date(year, month - 1, day); // Strapi stores YYYY-MM-DD
+};
+
+const checkReservationOverlap = (
+    reservations: any[],
+    userCheckInDate: Date,
+    userCheckOutDate: Date
+): boolean => {
+    if (!userCheckInDate || !userCheckOutDate) return false;
+    const userCheckIn = normalizeDate(userCheckInDate);
+    const userCheckOut = normalizeDate(userCheckOutDate);
+    return reservations.some((res) => {
+        const existingCheckIn = normalizeDate(parseStrapiDate(res.chackIn));
+        const existingCheckOut = normalizeDate(parseStrapiDate(res.checkOut));
+        return userCheckIn < existingCheckOut && userCheckOut > existingCheckIn;
+    });
 };
 
 const Reservation = ({
@@ -44,95 +53,70 @@ const Reservation = ({
     isUserAuthenticated: boolean | null;
     userData: any;
 }) => {
-    const [checkInDate, setCheckInDate] = useState<Date>();
-    const [checkOutDate, setCheckOutDate] = useState<Date>();
+    const [checkInDate, setCheckInDate] = useState<any | undefined>();
+    const [checkOutDate, setCheckOutDate] = useState<any | undefined>();
     const [alertMessage, setAlertMessage] = useState<null | {
         message: string;
         type: "error" | "success" | null;
     }>(null);
 
-    const router = useRouter();
-
-    const formatDateForStrapi = (date: Date) => {
-        return date.toISOString().split("T")[0]; // Format to YYYY-MM-DD
-    };
-
-    // filter out reservations that overlap with the selected dates
-    const isReserved = reservations.data
-        .filter((item: any) => item.room.data.id == room.id)
-        .some((item: any) => {
-            if (!checkInDate || !checkOutDate) return false;
-            const existingCheckIn = new Date(item.attributes.checkIn).setHours(
-                0,
-                0,
-                0,
-                0
+    useEffect(() => {
+        console.log("checkInDate", checkInDate);
+        toast("selected a date")
+        if (checkInDate && checkOutDate) {
+            const isOverlap = checkReservationOverlap(
+                reservations,
+                checkInDate,
+                checkOutDate
             );
-            const existingCheckout = new Date(
-                item.attributes.checkOut
-            ).setHours(0, 0, 0, 0);
 
-            const checkInTime = checkInDate?.setHours(0, 0, 0, 0);
-            const checkoutTime = checkOutDate?.setHours(0, 0, 0, 0);
-
-            // check if overlaps
-            const isReservedBetweenHours =
-                (checkInTime >= existingCheckIn &&
-                    checkInTime < existingCheckout) ||
-                (checkoutTime > existingCheckIn &&
-                    checkoutTime <= existingCheckout) ||
-                (existingCheckIn > checkInTime &&
-                    existingCheckIn < checkoutTime) ||
-                (existingCheckout > checkInTime &&
-                    existingCheckout < checkoutTime);
-        });
-
-    if (isReserved) {
-        setAlertMessage({
-            type: "error",
-            message: "This room is already reserved for the selected dates.",
-        });
-    } else {
-        const payload = {
-            data: {
-                firstName: userData?.firstName,
-                lastName: userData?.lastName,
-                email: userData?.email,
-                checkIn: checkInDate ? formatDateForStrapi(checkInDate) : null,
-                checkOut: checkOutDate
-                    ? formatDateForStrapi(checkOutDate)
-                    : null,
-                room: room.id,
-            },
-        };
-
-        postData("http://localhost:1337/api/reservations", payload);
-        setAlertMessage({
-            type: "success",
-            message: "Reservation saved successfully.",
-        });
-        router.refresh();
-    }
+            if (isOverlap) {
+                toast("Dates are not available for booking.")
+            } else {
+                toast("Dates are available for booking.")
+            }
+        }
+        else {
+            setAlertMessage(null);
+        }
+    }, [checkInDate, checkOutDate]);
 
     const saveReservation = async () => {
-        //
         if (!checkInDate || !checkOutDate) {
-            setAlertMessage({
-                type: "error",
-                message: "Please select both check-in and check-out dates.",
-            });
-
-            if (checkInDate?.getTime() === checkOutDate?.getTime()) {
-                setAlertMessage({
-                    type: "error",
-                    message: "Check-in and check-out dates cannot be the same.",
-                });
-            }
-
+            toast("Please select both check-in and check-out dates.");
             return;
         }
-        console.log("reservation saved");
+
+        const formattedCheckIn = format(checkInDate, "yyyy-MM-dd");
+        const formattedCheckOut = format(checkOutDate, "yyyy-MM-dd");
+
+        try {
+            const res = await fetch(`http://127.0.0.1:1337/api/reservations`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    data: {
+                        firstname: "subha",
+                        lastname: "kumar",
+                        email: "sundorikomola@gmail.com",
+                        chackIn: formattedCheckIn,
+                        checkOut: formattedCheckOut,
+                        room: room.documentId,
+                    },
+                }),
+            });
+
+            if (!res.ok) throw new Error("Failed to save reservation");
+            toast("Reservation saved successfully!");
+        } catch (err) {
+            console.error(err);
+            toast("Error saving reservation");
+        }
     };
+
+
 
     return (
         <div>
@@ -164,8 +148,7 @@ const Reservation = ({
                             <Calendar
                                 mode="single"
                                 selected={checkInDate}
-                                onSelect={setCheckInDate}
-                                disabled={(date) =>
+                                onSelect={setCheckInDate} disabled={(date) =>
                                     date <
                                     new Date(new Date().setHours(0, 0, 0, 0))
                                 }

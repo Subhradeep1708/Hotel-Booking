@@ -40,7 +40,7 @@ const Header = async () => {
     const isUserAuthenticated = await isAuthenticated();
     const user = isUserAuthenticated ? await getUser() : null;
 
-    console.log("User Authenticated:", isUserAuthenticated);
+    // console.log("User Authenticated:", isUserAuthenticated);
 
     return (
         <header className="py-6 shadow-md ">

@@ -25,7 +25,7 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
     const id = (await params).id;
 
     const reservations = await getReservationData(id);
-    console.log("reservations::", reservations);
+    // console.log("reservations::", reservations);
     const { getUser, isAuthenticated } = getKindeServerSession();
     const isUserAuthenticated = await isAuthenticated();
     const userData = await getUser();
@@ -39,12 +39,12 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
         // console.log("success::", res);
         const result = await res.json();
         room = result.data;
-        console.log("data::", result);
+        // console.log("data::", result);
     } catch (error) {
         console.log("error");
     }
     const imgURL = `http://127.0.0.1:1337${room.image.url}`;
-    console.log("imgURL::", imgURL);
+    // console.log("imgURL::", imgURL);
 
     return (
         <section className="min-h-[80vh]">
@@ -95,7 +95,7 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
                     {/* reservation */}
                     <div className="w-full lg:max-w-[360px] h-max">
                         <Reservation
-                            reservations={reservations}
+                            reservations={reservations.data.reservations}
                             room={room}
                             isUserAuthenticated={isUserAuthenticated}
                             userData={userData}

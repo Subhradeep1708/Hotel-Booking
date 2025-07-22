@@ -13,7 +13,7 @@ const links = [
 
 
 const Nav = ({ isUserAuthenticated }: { isUserAuthenticated: boolean | null }) => {
-    console.log("User Authenticated in Nav:", isUserAuthenticated);
+    // console.log("User Authenticated in Nav:", isUserAuthenticated);
 
     const pathname = usePathname();
     return (
