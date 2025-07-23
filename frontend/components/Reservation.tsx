@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import PaymentPage from "@/app/test/page";
 import Payment from "./Payment";
 import { toast } from "sonner"
+import { STRAPI_API_URL } from "@/utils/env";
 
 const normalizeDate = (date: Date): number => {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
@@ -91,7 +92,7 @@ const Reservation = ({
         const formattedCheckOut = format(checkOutDate, "yyyy-MM-dd");
 
         try {
-            const res = await fetch(`http://127.0.0.1:1337/api/reservations`, {
+            const res = await fetch(`${STRAPI_API_URL}/api/reservations`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

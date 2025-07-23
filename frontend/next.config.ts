@@ -5,7 +5,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        hostname: "127.0.0.1",
+        hostname: 'sincere-nurture-b2ce18c6cc.media.strapiapp.com',
+        protocol: 'https',
       }
     ]
   }

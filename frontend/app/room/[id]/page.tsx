@@ -1,4 +1,5 @@
 import Reservation from "@/components/Reservation";
+import { STRAPI_API_URL } from "@/utils/env";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import Image from "next/image";
 import {
@@ -10,7 +11,7 @@ import {
 
 const getReservationData = async (documentId: string) => {
     const res = await fetch(
-        `http://127.0.0.1:1337/api/rooms/${documentId}?populate=*`,
+        `${STRAPI_API_URL}/api/rooms/${documentId}?populate=*`,
         {
             next: {
                 revalidate: 0,
@@ -34,7 +35,7 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
 
     try {
         const res = await fetch(
-            `http://127.0.0.1:1337/api/rooms/${id}?populate=*`
+            `${STRAPI_API_URL}/api/rooms/${id}?populate=*`
         );
         // console.log("success::", res);
         const result = await res.json();
@@ -43,7 +44,7 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
     } catch (error) {
         console.log("error");
     }
-    const imgURL = `http://127.0.0.1:1337${room.image.url}`;
+    const imgURL = `${STRAPI_API_URL}${room.image.url}`;
     // console.log("imgURL::", imgURL);
 
     return (

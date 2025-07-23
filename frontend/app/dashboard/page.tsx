@@ -6,7 +6,7 @@ import React from "react";
 const getUserReservation = async (userEmail: any) => {
     try {
         const response = await fetch(
-            `http://localhost:1337/api/reservations?filters[user][email][$eq]=${userEmail}&populate=*`,
+            `${process.env.STRAPI_API_URL}/api/reservations?filters[user][email][$eq]=${userEmail}&populate=*`,
             {
                 next: { revalidate: 0 },
             }

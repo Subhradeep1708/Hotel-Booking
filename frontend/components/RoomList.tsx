@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { FaStar, FaStarHalf } from "react-icons/fa"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { NEXT_PUBLIC_STRAPI_API_URL, STRAPI_API_URL } from "@/utils/env"
 
 
 
@@ -58,7 +59,8 @@ const RoomList = ({ rooms }: { rooms: any }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-5xl mx-auto">
                 {filteredRooms.map((room: any) => {
-                    const imageURL = `http://127.0.0.1:1337${room.image.url} `
+                    
+                    const imageURL = `${room.image.url} `
                     return (
                         <div key={room.id} >
                             <Link href={`/room/${room.documentId}`}>
