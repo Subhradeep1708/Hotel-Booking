@@ -42,16 +42,16 @@ export const Dropdown = ({ user }: { user: any }) => {
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-72 mt-4 p-4 flex flex-col gap-2 items-start">
-                <DropdownMenuLabel className="text-base">
+                <DropdownMenuLabel className="text-base text-center mx-auto">
                     My Account
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuGroup className="flex flex-col gap-2">
+                <DropdownMenuGroup className="flex flex-col gap-2 w-full">
                     <Link href="/">
                         <DropdownMenuItem>
                             Homepage
-                            <DropdownMenuShortcut className="text-lg text-accent">
-                                <FaHome />
+                            <DropdownMenuShortcut className="text-lg ">
+                                <FaHome className="text-accent" />
                             </DropdownMenuShortcut>
                         </DropdownMenuItem>
                     </Link>
@@ -59,17 +59,17 @@ export const Dropdown = ({ user }: { user: any }) => {
                         <DropdownMenuItem>
                             My Bookings
                             <DropdownMenuShortcut className="text-lg text-accent">
-                                <FaCalendarCheck />
+                                <FaCalendarCheck className="text-accent" />
                             </DropdownMenuShortcut>
                         </DropdownMenuItem>
                     </Link>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <LogoutLink>
+                <LogoutLink className="w-full">
                     <DropdownMenuItem>
                         Logout
                         <DropdownMenuShortcut className="text-lg text-accent">
-                            <FaSignOutAlt />
+                            <FaSignOutAlt className="text-red-600 focus:text-white" />
                         </DropdownMenuShortcut>
                     </DropdownMenuItem>
                 </LogoutLink>

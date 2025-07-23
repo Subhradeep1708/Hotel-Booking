@@ -13,14 +13,16 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
-import { useRouter } from "next/navigation";
-import PaymentPage from "@/app/test/page";
 import Payment from "./Payment";
-import { toast } from "sonner"
+import { toast } from "sonner";
 import { STRAPI_API_URL } from "@/utils/env";
 
 const normalizeDate = (date: Date): number => {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+    ).getTime();
 };
 
 const parseStrapiDate = (dateStr: string): Date => {
@@ -60,10 +62,15 @@ const Reservation = ({
         message: string;
         type: "error" | "success" | null;
     }>(null);
+    console.log("User Data:", userData);
+
+    useEffect(() => {
+        toast("Select a date to check availability");
+    }, [checkInDate]);
 
     useEffect(() => {
         console.log("checkInDate", checkInDate);
-        toast("selected a date")
+        toast("selected a date");
         if (checkInDate && checkOutDate) {
             const isOverlap = checkReservationOverlap(
                 reservations,
@@ -72,16 +79,16 @@ const Reservation = ({
             );
 
             if (isOverlap) {
-                toast("Dates are not available for booking.")
+                toast.success("Dates are not available for booking.");
             } else {
-                toast("Dates are available for booking.")
+                toast.error("Dates are available for booking.");
             }
-        }
-        else {
+        } else {
             setAlertMessage(null);
         }
     }, [checkInDate, checkOutDate]);
 
+    // console.log("Room", room.price);
     const saveReservation = async () => {
         if (!checkInDate || !checkOutDate) {
             toast("Please select both check-in and check-out dates.");
@@ -92,22 +99,25 @@ const Reservation = ({
         const formattedCheckOut = format(checkOutDate, "yyyy-MM-dd");
 
         try {
-            const res = await fetch(`${STRAPI_API_URL}/api/reservations`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    data: {
-                        firstname: "subha",
-                        lastname: "kumar",
-                        email: "sundorikomola@gmail.com",
-                        chackIn: formattedCheckIn,
-                        checkOut: formattedCheckOut,
-                        room: room.documentId,
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/reservations`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
                     },
-                }),
-            });
+                    body: JSON.stringify({
+                        data: {
+                            firstname: userData?.given_name || "",
+                            lastname: userData.family_name || "",
+                            email: userData?.email,
+                            chackIn: formattedCheckIn,
+                            checkOut: formattedCheckOut,
+                            room: room.documentId,
+                        },
+                    }),
+                }
+            );
 
             if (!res.ok) throw new Error("Failed to save reservation");
             toast("Reservation saved successfully!");
@@ -116,8 +126,6 @@ const Reservation = ({
             toast("Error saving reservation");
         }
     };
-
-
 
     return (
         <div>
@@ -149,7 +157,8 @@ const Reservation = ({
                             <Calendar
                                 mode="single"
                                 selected={checkInDate}
-                                onSelect={setCheckInDate} disabled={(date) =>
+                                onSelect={setCheckInDate}
+                                disabled={(date) =>
                                     date <
                                     new Date(new Date().setHours(0, 0, 0, 0))
                                 }
@@ -187,7 +196,7 @@ const Reservation = ({
                     {isUserAuthenticated ? (
                         <Payment
                             onPaymentSuccess={saveReservation}
-                            amountInRupees={100}
+                            amountInRupees={room.price}
                             customerData={{
                                 firstName: userData?.firstName,
                                 lastName: userData?.lastName,

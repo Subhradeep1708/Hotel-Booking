@@ -8,7 +8,13 @@ const Hero = () => {
                     <h1 className="h1 text-white text-center max-w-[800px] mb-8">
                         Experience hospitality at its finest
                     </h1>
-                    <Button size="lg">Discover more</Button>
+                    <Button
+                        size="lg"
+                        variant={"primary"}
+                        className="rounded-none"
+                    >
+                        Discover more
+                    </Button>
                 </div>
             </div>
         </section>

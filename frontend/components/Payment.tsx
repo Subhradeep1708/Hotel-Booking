@@ -2,6 +2,7 @@
 import React from "react";
 import Script from "next/script";
 import { Button } from "./ui/button";
+import { Phone } from "lucide-react";
 
 declare global {
     interface Window {
@@ -20,7 +21,7 @@ const Payment = ({
     customerData: any;
     children: React.ReactNode;
 }) => {
-    const AMOUNT = amountInRupees * 100; // Amount in paise (50000 paise = 500 INR)
+    const AMOUNT = amountInRupees * 100;
     const [isProcessing, setProcessing] = React.useState(false);
 
     const handlePayment = async () => {
@@ -31,6 +32,11 @@ const Payment = ({
                 headers: {
                     "Content-Type": "application/json",
                 },
+                body: JSON.stringify({
+                    amount: AMOUNT,
+                    currency: "INR",
+                    customerData,
+                }),
             });
 
             const data = await response.json();

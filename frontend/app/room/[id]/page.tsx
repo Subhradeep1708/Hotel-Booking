@@ -34,9 +34,7 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
     let room: any;
 
     try {
-        const res = await fetch(
-            `${STRAPI_API_URL}/api/rooms/${id}?populate=*`
-        );
+        const res = await fetch(`${STRAPI_API_URL}/api/rooms/${id}?populate=*`);
         // console.log("success::", res);
         const result = await res.json();
         room = result.data;
@@ -44,7 +42,7 @@ const RoomDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
     } catch (error) {
         console.log("error");
     }
-    const imgURL = `${STRAPI_API_URL}${room.image.url}`;
+    const imgURL = `${room.image.url}`;
     // console.log("imgURL::", imgURL);
 
     return (
